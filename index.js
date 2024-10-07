@@ -25,9 +25,32 @@ async function run() {
     // Connect the client to the server	(optional starting in v4.7)
     await client.connect();
 
+    const touristsSpotCollection= client.db('spotDB').collection('spot')
     const userCollection= client.db('UsersDB').collection('user')
 
+    app.get('/tourists-spots', async(req,res)=>{
+      const cursor = touristsSpotCollection.find()
+      const result = await cursor.toArray()
+      res.send(result)
+    })
+    app.get('/tourists-spots/:id', async(req,res)=>{
+      const id = req.params.id
+      const query = {_id:new ObjectId(id)}
+      const result = await  touristsSpotCollection.findOne(query)
+      res.send(result)
+    })
 
+    app.post('/tourists-spots', async(req,res)=>{
+      const spot = req.body
+      const result = await touristsSpotCollection.insertOne(spot)
+      res.send(result)
+    })
+
+    app.delete('/tourists-spots/:id', async(req,res)=>{
+      const id = req.params.id
+      const query = {_id:new ObjectId(id)}
+      const result = await  touristsSpotCollection.deleteOne(query)
+    })
 
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
